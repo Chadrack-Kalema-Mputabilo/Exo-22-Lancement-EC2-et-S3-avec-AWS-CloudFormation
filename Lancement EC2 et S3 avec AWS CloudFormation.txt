@@ -1,0 +1,85 @@
+Voici une procédure pour lancer une infrastructure informatique sur AWS en utilisant AWS CloudFormation. Cette infrastructure comprendra deux instances EC2 et un bucket S3.
+
+### Étape 1 : Créer le fichier de modèle CloudFormation
+
+Créez un fichier YAML (par exemple, `infrastructure.yaml`) contenant la définition de votre infrastructure.
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Infrastructure avec 2 instances EC2 et un bucket S3
+
+Resources:
+
+  # Création du bucket S3
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-unique-bucket-name # Remplacez par un nom de bucket unique
+
+  # Création de la première instance EC2
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0 # Remplacez par un AMI valide pour votre région
+      KeyName: my-key-pair # Remplacez par votre paire de clés
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+
+  # Création de la deuxième instance EC2
+  EC2Instance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0 # Remplacez par un AMI valide pour votre région
+      KeyName: my-key-pair # Remplacez par votre paire de clés
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+
+  # Création du groupe de sécurité
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow SSH and HTTP access"
+      VpcId: vpc-xxxxxxx # Remplacez par l'ID de votre VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0 # Permettre l'accès SSH depuis n'importe où
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # Permettre HTTP
+
+Outputs:
+  S3BucketName:
+    Description: "Nom du bucket S3"
+    Value: !Ref MyS3Bucket
+  EC2Instance1PublicIP:
+    Description: "Adresse IP publique de l'instance 1"
+    Value: !GetAtt EC2Instance1.PublicIp
+  EC2Instance2PublicIP:
+    Description: "Adresse IP publique de l'instance 2"
+    Value: !GetAtt EC2Instance2.PublicIp
+```
+
+### Étape 2 : Déployer le modèle CloudFormation
+
+1. **Ouvrez la console AWS CloudFormation**.
+2. **Cliquez sur "Créer une pile"**.
+3. **Sélectionnez "Avec des nouvelles ressources (standard)"**.
+4. **Téléversez votre fichier YAML** ou collez le contenu du modèle dans l'éditeur.
+5. **Cliquez sur "Suivant"**.
+6. **Configurez les options de la pile** (nom de la pile, paramètres, etc.).
+7. **Cliquez sur "Suivant"**.
+8. **Vérifiez les paramètres** et cliquez sur "Créer la pile".
+
+### Étape 3 : Vérifier le déploiement
+
+- Une fois le déploiement terminé, vous pouvez vérifier les ressources créées dans la console CloudFormation.
+- Consultez les **sorties** de la pile pour obtenir le nom du bucket S3 et les adresses IP publiques des instances EC2.
+
+### Conclusion
+
+Avec ces étapes, vous avez créé une infrastructure de base sur AWS avec deux instances EC2 et un bucket S3 en utilisant AWS CloudFormation. Assurez-vous de remplacer les valeurs de configuration par celles appropriées à votre environnement.
